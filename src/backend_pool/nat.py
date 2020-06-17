@@ -83,7 +83,7 @@ class NATService:
             else:
                 nat_ssh = reactor.listenTCP(0, ServerFactory(dst_ip, ssh_port), interface='0.0.0.0')
                 nat_telnet = reactor.listenTCP(0, ServerFactory(dst_ip, telnet_port), interface='0.0.0.0')
-                self.bindings[guest_id] = [0, nat_ssh, nat_telnet]
+                self.bindings[guest_id] = [1, nat_ssh, nat_telnet]
 
                 return nat_ssh._realPortNumber, nat_telnet._realPortNumber
         finally:
