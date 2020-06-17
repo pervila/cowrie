@@ -74,13 +74,14 @@ class NATService:
         self.lock.acquire()
         try:
             # see if binding is already created
-            if dst_ip in self.bindings:
+            if guest_id in self.bindings:
                 # increase connected
                 self.bindings[guest_id][0] += 1
+                print('bind to existing, guest ' + str(guest_id) + ', bind ' + str(self.bindings[guest_id]) + ', total bindings: ' + str(len(self.bindings)))
 
                 return self.bindings[guest_id][1]._realPortNumber, self.bindings[guest_id][2]._realPortNumber
-
             else:
+                print('bind to new, guest ' + str(guest_id) + ', total bindings: ' + str(len(self.bindings)))
                 nat_ssh = reactor.listenTCP(0, ServerFactory(dst_ip, ssh_port), interface='0.0.0.0')
                 nat_telnet = reactor.listenTCP(0, ServerFactory(dst_ip, telnet_port), interface='0.0.0.0')
                 self.bindings[guest_id] = [1, nat_ssh, nat_telnet]
@@ -90,14 +91,28 @@ class NATService:
             self.lock.release()
 
     def free_binding(self, guest_id):
+        print('free id ' + str(guest_id))
+        print('binding size ' + str(len(self.bindings)))
         self.lock.acquire()
         try:
             self.bindings[guest_id][0] -= 1
 
-            # stop listening if no-one connected
+            # stop listening if no one is connected
             if self.bindings[guest_id][0] <= 0:
+                print('will free')
                 self.bindings[guest_id][1].stopListening()
                 self.bindings[guest_id][2].stopListening()
+                del self.bindings[guest_id]
+                print('new binding size ' + str(len(self.bindings)))
+        finally:
+            self.lock.release()
 
+    def free_all(self):
+        self.lock.acquire()
+        try:
+            for guest_id in self.bindings:
+                print(self.bindings[guest_id][1])
+                self.bindings[guest_id][1].stopListening()
+                self.bindings[guest_id][2].stopListening()
         finally:
             self.lock.release()
