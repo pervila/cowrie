@@ -68,6 +68,7 @@ class PoolServer(Protocol):
                 if not self.local_pool and self.use_nat or self.pool_only:
                     nat_ssh_port, nat_telnet_port = self.factory.nat.request_binding(guest_id, guest_ip,
                                                                                      ssh_port, telnet_port)
+                    print('got a nat binding (guest ' + guest_id + '), ' + str(nat_ssh_port) + ' ' + str(nat_telnet_port))
 
                     fmt = '!cIIH{0}sHHH{1}s'.format(len(self.nat_public_ip), len(guest_snapshot))
                     response = struct.pack(fmt, b'r', 0, guest_id, len(self.nat_public_ip), self.nat_public_ip.encode(),
