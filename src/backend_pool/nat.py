@@ -74,7 +74,7 @@ class NATService:
         self.lock.acquire()
         try:
             # see if binding is already created
-            if dst_ip in self.bindings:
+            if guest_id in self.bindings:
                 # increase connected
                 self.bindings[guest_id][0] += 1
 
