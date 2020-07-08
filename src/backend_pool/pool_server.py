@@ -69,6 +69,7 @@ class PoolServer(Protocol):
                     nat_ssh_port, nat_telnet_port = self.factory.nat.request_binding(guest_id, guest_ip,
                                                                                      ssh_port, telnet_port)
 
+                    print((guest_id, len(self.nat_public_ip), self.nat_public_ip.encode(), nat_ssh_port, nat_telnet_port, len(guest_snapshot), guest_snapshot.encode()))
                     fmt = '!cIIH{0}sHHH{1}s'.format(len(self.nat_public_ip), len(guest_snapshot))
                     response = struct.pack(fmt, b'r', 0, guest_id, len(self.nat_public_ip), self.nat_public_ip.encode(),
                                            nat_ssh_port, nat_telnet_port, len(guest_snapshot), guest_snapshot.encode())
